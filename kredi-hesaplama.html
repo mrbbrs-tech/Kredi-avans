@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#F5F3EE"/>
+<title>KrediHesap</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--surface2:#F0EDE7;--border:#E4E0D8;
+  --text:#1A1714;--text2:#7A7570;--text3:#C8C4BC;
+  --green:#1A7A4A;--green-light:#E8F5EE;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --blue:#2563EB;--blue-light:#EFF6FF;
+  --teal:#0891B2;--teal-light:#ECFEFF;
+  --nav-h:72px;
+}
+html,body{height:100%;background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);overflow:hidden}
+.shell{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+.topbar{padding:46px 20px 12px;background:var(--bg);flex-shrink:0;z-index:10}
+.topbar-row{display:flex;align-items:center;justify-content:space-between}
+.app-name{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+.topbar h2{font-size:22px;font-weight:800;color:var(--text);line-height:1.1;margin-top:4px}
+.scroll-area{flex:1;overflow-y:auto;padding:6px 14px calc(var(--nav-h) + 20px);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.scroll-area::-webkit-scrollbar{display:none}
+
+/* CARD */
+.card{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid var(--border)}
+.card-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);margin-bottom:12px}
+
+/* INPUTS */
+.input-group{display:flex;flex-direction:column;gap:9px}
+.input-row{display:flex;align-items:center;background:var(--surface2);border-radius:11px;padding:0 13px;border:1.5px solid transparent;transition:border-color .15s,background .15s}
+.input-row:focus-within{border-color:var(--green);background:var(--green-light)}
+.input-row.blue:focus-within{border-color:var(--blue);background:var(--blue-light)}
+.input-row.teal:focus-within{border-color:var(--teal);background:var(--teal-light)}
+.input-icon{font-size:15px;margin-right:8px;flex-shrink:0}
+.input-col{flex:1;padding:10px 0}
+.input-col label{display:block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:1px}
+.input-col input{width:100%;background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--text);-webkit-appearance:none}
+.input-col input::placeholder{color:var(--text3);font-weight:400}
+.input-suffix{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--text2);flex-shrink:0}
+.name-row{display:flex;align-items:center;background:var(--surface2);border-radius:11px;padding:0 13px;border:1.5px solid transparent;transition:border-color .15s;margin-bottom:9px}
+.name-row:focus-within{border-color:var(--blue);background:var(--blue-light)}
+.name-row input{flex:1;padding:11px 0;background:transparent;border:none;outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.name-row input::placeholder{color:var(--text3);font-weight:500}
+
+/* BUTTONS */
+.btn-primary{width:100%;background:var(--green);border:none;border-radius:12px;padding:13px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-primary:active{opacity:.85;transform:scale(.98)}
+.btn-primary.blue{background:var(--blue)}
+.btn-primary.teal{background:var(--teal)}
+.btn-sm{padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-sm:active{transform:scale(.97)}
+.btn-sm.g{color:var(--green);border-color:var(--green);background:var(--green-light)}
+.btn-sm.r{color:var(--red);border-color:rgba(220,38,38,.2);background:var(--red-light)}
+.btn-sm.b{color:var(--blue);border-color:rgba(37,99,235,.2);background:var(--blue-light)}
+.btn-row{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+
+/* STAT ROW */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border-bottom:none}
+.s-label{font-size:12px;font-weight:600;color:var(--text2)}
+.s-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--text)}
+.s-val.green{color:var(--green)} .s-val.red{color:var(--red)} .s-val.amber{color:var(--amber)} .s-val.blue{color:var(--blue)}
+
+/* VERGILI */
+.vergili-pill{display:flex;align-items:center;justify-content:space-between;background:var(--green-light);border-radius:11px;padding:12px 14px;border:1px solid rgba(26,122,74,.15)}
+.v-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green)}
+.v-sub{font-size:10px;color:var(--text2);margin-top:1px;font-family:'JetBrains Mono',monospace}
+.v-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--green)}
+
+/* HERO */
+.hero-card{border-radius:18px;padding:20px 18px;margin-bottom:10px;position:relative;overflow:hidden}
+.hero-card.green{background:var(--green)}
+.hero-card.blue{background:var(--blue)}
+.hero-card.teal{background:var(--teal)}
+.hero-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.07);border-radius:50%}
+.hero-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)}
+.hero-val{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:600;color:#fff;margin:4px 0 0;line-height:1}
+.hero-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:4px}
+
+/* MINI GRID */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mini-card{background:var(--surface);border-radius:14px;padding:13px;border:1px solid var(--border)}
+.mini-card.amber{background:var(--amber-light);border-color:rgba(217,119,6,.2)}
+.mini-card.red{background:var(--red-light);border-color:rgba(220,38,38,.15)}
+.mini-card.blue{background:var(--blue-light);border-color:rgba(37,99,235,.15)}
+.mini-card.teal{background:var(--teal-light);border-color:rgba(8,145,178,.15)}
+.mini-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:4px;line-height:1.3}
+.mini-card.amber .mini-label{color:var(--amber)} .mini-card.red .mini-label{color:var(--red)}
+.mini-card.blue .mini-label{color:var(--blue)} .mini-card.teal .mini-label{color:var(--teal)}
+.mini-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--text)}
+.mini-card.amber .mini-val{color:var(--amber)} .mini-card.red .mini-val{color:var(--red)}
+.mini-card.blue .mini-val{color:var(--blue)} .mini-card.teal .mini-val{color:var(--teal)}
+
+/* KMH */
+.kmh-result{background:var(--teal);border-radius:18px;padding:18px;margin-bottom:10px;position:relative;overflow:hidden}
+.kmh-result::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.07);border-radius:50%}
+.kmh-row{display:flex;justify-content:space-between;align-items:flex-end}
+.kmh-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)}
+.kmh-val{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:600;color:#fff;margin-top:4px}
+.kmh-detail{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.kmh-det{background:rgba(255,255,255,.12);border-radius:9px;padding:10px 11px}
+.kmh-det-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:3px}
+.kmh-det-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#fff}
+
+/* KMH TABLE */
+.kmh-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:var(--surface);margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px;min-width:300px}
+thead tr{background:var(--surface2)}
+th{padding:9px 11px;text-align:right;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);white-space:nowrap;border-bottom:1px solid var(--border)}
+th:first-child{text-align:center}
+td{padding:8px 11px;text-align:right;font-size:11px;color:var(--text);border-bottom:1px solid var(--border);white-space:nowrap}
+td:first-child{text-align:center;color:var(--text2);font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(0,0,0,.012)}
+.td-green{color:var(--green);font-weight:600} .td-red{color:var(--red)} .td-amber{color:var(--amber)}
+
+/* INFLATION */
+.inf-bar{height:8px;background:var(--surface2);border-radius:100px;overflow:hidden;margin-top:6px}
+.inf-fill{height:100%;border-radius:100px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+.inf-row{margin-bottom:12px}
+.inf-header{display:flex;justify-content:space-between;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:3px}
+
+/* COMPARE */
+.winner-banner{display:flex;align-items:center;gap:12px;background:var(--green);border-radius:14px;padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden}
+.winner-banner::before{content:'';position:absolute;top:-25px;right:-25px;width:80px;height:80px;background:rgba(255,255,255,.07);border-radius:50%}
+.winner-icon{font-size:24px}
+.wt1{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)}
+.wt2{font-size:16px;font-weight:800;color:#fff;margin-top:2px}
+.compare-list{display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
+.compare-card{border-radius:14px;padding:14px;border:2px solid var(--border);background:var(--surface);position:relative}
+.compare-card.best{border-color:var(--green)}
+.cc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cc-name-row{display:flex;align-items:center;gap:7px}
+.cc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.cc-name{font-size:13px;font-weight:800}
+.cc-badges{display:flex;gap:4px}
+.badge{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:100px}
+.badge-green{background:var(--green-light);color:var(--green)}
+.badge-amber{background:var(--amber-light);color:var(--amber)}
+.cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.cc-stat{background:var(--surface2);border-radius:9px;padding:9px 11px}
+.cc-stat.hl-g{background:var(--green-light)} .cc-stat.hl-a{background:var(--amber-light)}
+.cc-stat-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:2px}
+.cc-stat.hl-g .cc-stat-label{color:var(--green)} .cc-stat.hl-a .cc-stat-label{color:var(--amber)}
+.cc-stat-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text)}
+.cc-stat.hl-g .cc-stat-val{color:var(--green)} .cc-stat.hl-a .cc-stat-val{color:var(--amber)}
+.cc-bar-label{display:flex;justify-content:space-between;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:3px}
+.cc-bar{height:5px;background:var(--surface2);border-radius:100px;overflow:hidden}
+.cc-bar-fill{height:100%;border-radius:100px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+.cc-del{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--surface2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px}
+
+/* HISTORY */
+.history-list{display:flex;flex-direction:column;gap:7px}
+.hist-card{background:var(--surface);border-radius:13px;padding:12px 14px;border:1px solid var(--border);display:flex;align-items:center;gap:9px;cursor:pointer;transition:border-color .15s,transform .1s}
+.hist-card:active{transform:scale(.98)}
+.hist-color{width:3px;align-self:stretch;border-radius:100px;flex-shrink:0}
+.hist-body{flex:1;min-width:0}
+.hist-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-meta{font-size:10px;color:var(--text2);margin-top:1px;font-family:'JetBrains Mono',monospace}
+.hist-right{text-align:right;flex-shrink:0}
+.hist-aylik{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text)}
+.hist-date{font-size:9px;color:var(--text3);margin-top:1px}
+.hist-del{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;flex-shrink:0}
+.hist-type{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 6px;border-radius:100px;margin-bottom:3px;display:inline-block}
+.ht-kredi{background:var(--green-light);color:var(--green)}
+.ht-kmh{background:var(--teal-light);color:var(--teal)}
+
+/* COLOR DOTS */
+.color-dots{display:flex;gap:6px;margin-top:9px}
+.color-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0}
+.color-dot.selected{border-color:var(--text);transform:scale(1.18)}
+
+/* SEGMENT */
+.segment{display:flex;background:var(--surface2);border-radius:11px;padding:3px;margin-bottom:12px}
+.seg-btn{flex:1;padding:8px;border:none;background:transparent;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s}
+.seg-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+/* NAV */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(255,255,255,.93);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:8px;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:color .15s;font-family:'Plus Jakarta Sans',sans-serif;position:relative}
+.nav-item.active{color:var(--green)}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0;transition:opacity .15s}
+.nav-item.active .nav-dot{opacity:1}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:.03em}
+.nav-item svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav-badge{position:absolute;top:0px;right:calc(50% - 20px);background:var(--green);color:#fff;font-size:8px;font-weight:700;min-width:14px;height:14px;border-radius:100px;display:none;align-items:center;justify-content:center;padding:0 3px}
+
+.tab-panel{display:none}.tab-panel.active{display:block}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:7px}
+.empty-icon{font-size:38px;opacity:.2}
+.empty-text{font-size:14px;font-weight:700;color:var(--text2)}
+.empty-sub{font-size:12px;color:var(--text3)}
+
+.toast{position:fixed;bottom:calc(var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(14px);background:#1A1714;color:#fff;font-size:12px;font-weight:600;padding:9px 16px;border-radius:100px;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;z-index:9999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.divider{height:1px;background:var(--border);margin:12px 0}
+.section-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
+
+/* TOGGLE SWITCH */
+.toggle-switch{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:100px;transition:.2s}
+.toggle-slider:before{position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-switch input:checked+.toggle-slider{background:var(--green)}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(18px)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="topbar-row">
+      <span class="app-name">KrediHesap</span>
+      <span id="topbar-sub" style="font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace"></span>
+    </div>
+    <h2 id="pageTitle">Hesapla</h2>
+  </div>
+
+  <div class="scroll-area">
+
+    <!-- ── TAB: HESAPLA ── -->
+    <div class="tab-panel active" id="tab-hesapla">
+      <!-- SEGMENT: Kredi / KMH -->
+      <div class="segment">
+        <button class="seg-btn active" id="seg-kredi" onclick="setMode('kredi')">🏦 Kredi</button>
+        <button class="seg-btn" id="seg-kmh" onclick="setMode('kmh')">💳 KMH / Kredili Mevduat</button>
+      </div>
+
+      <!-- KREDI SECTION -->
+      <div id="section-kredi">
+        <div class="card">
+          <div class="card-title">Kredi Adı &amp; Renk</div>
+          <div class="name-row"><input type="text" placeholder="ör. Ziraat Bankası Konut" id="inp-name" maxlength="30"/></div>
+          <div class="color-dots" id="color-dots"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Kredi Bilgileri</div>
+          <div class="input-group">
+            <div class="input-row"><span class="input-icon">🏦</span><div class="input-col"><label>Ana Para</label><input type="number" inputmode="decimal" placeholder="500000" id="inp-anapara"/></div><span class="input-suffix">₺</span></div>
+            <div class="input-row"><span class="input-icon">📈</span><div class="input-col"><label>Aylık Faiz Oranı</label><input type="number" inputmode="decimal" placeholder="3.50" id="inp-faiz"/></div><span class="input-suffix">%</span></div>
+            <div class="input-row"><span class="input-icon">🗓️</span><div class="input-col"><label>Vade</label><input type="number" inputmode="numeric" placeholder="120" id="inp-sure"/></div><span class="input-suffix">ay</span></div>
+          </div>
+          <!-- BSMV TOGGLE -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:11px 14px;background:var(--surface2);border-radius:11px;">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">BSMV Uygula</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:1px">Faiz oranı × 1,3 (Banka Sigorta Muamele Vergisi)</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="bsmv-toggle" checked onchange="hesapla()"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div id="kredi-sonuc" style="display:none">
+          <div class="card">
+            <div class="card-title">Vergili Faiz (BSMV Dahil)</div>
+            <div class="vergili-pill">
+              <div><div class="v-label">Vergili Aylık Faiz</div><div class="v-sub" id="v-formula"></div></div>
+              <div class="v-val" id="v-val"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Sonuçlar</div>
+            <div class="stat-row"><span class="s-label">Aylık Ödeme</span><span class="s-val green" id="qs-aylik"></span></div>
+            <div class="stat-row"><span class="s-label">YYO / Efektif</span><span class="s-val" id="qs-yyo"></span></div>
+            <div class="stat-row"><span class="s-label">Toplam Ödenen</span><span class="s-val" id="qs-toplam"></span></div>
+            <div class="stat-row"><span class="s-label">Toplam Faiz</span><span class="s-val red" id="qs-faiz"></span></div>
+          </div>
+          <!-- ENFLASYON -->
+          <div class="card" id="inflation-card">
+            <div class="card-title">Enflasyon / Reel Maliyet</div>
+            <div class="input-row" style="margin-bottom:10px"><span class="input-icon">📊</span><div class="input-col"><label>Yıllık Enflasyon Tahmini</label><input type="number" inputmode="decimal" placeholder="40" id="inp-enflasyon" oninput="renderEnflasyon()"/></div><span class="input-suffix">%</span></div>
+            <div id="enflasyon-sonuc" style="display:none">
+              <div class="inf-row">
+                <div class="inf-header"><span>Nominal faiz yükü</span><span id="inf-nominal-pct"></span></div>
+                <div class="inf-bar"><div class="inf-fill" id="inf-nominal-bar" style="background:var(--red)"></div></div>
+              </div>
+              <div class="inf-row">
+                <div class="inf-header"><span>Reel faiz yükü</span><span id="inf-reel-pct"></span></div>
+                <div class="inf-bar"><div class="inf-fill" id="inf-reel-bar" style="background:var(--blue)"></div></div>
+              </div>
+              <div class="stat-row"><span class="s-label">Reel faiz oranı</span><span class="s-val blue" id="inf-reel-oran"></span></div>
+              <div class="stat-row"><span class="s-label">Enflasyonla eriyecek borç</span><span class="s-val green" id="inf-eriyecek"></span></div>
+              <div class="stat-row"><span class="s-label">Gerçek ek maliyet</span><span class="s-val red" id="inf-gercek"></span></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-sm g" onclick="saveKredi()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Kaydet &amp; Karşılaştır
+            </button>
+            <button class="btn-sm b" onclick="shareKredi()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Paylaş
+            </button>
+          </div>
+        </div>
+        <div class="empty" id="kredi-empty">
+          <div class="empty-icon">🧮</div>
+          <div class="empty-text">Hesaplama bekleniyor</div>
+          <div class="empty-sub">Alanları doldurun</div>
+        </div>
+      </div>
+
+      <!-- KMH SECTION -->
+      <div id="section-kmh" style="display:none">
+        <div class="card">
+          <div class="card-title">Kredili Mevduat Hesabı</div>
+          <div class="input-group">
+            <div class="input-row teal"><span class="input-icon">💰</span><div class="input-col"><label>Çekilen Tutar</label><input type="number" inputmode="decimal" placeholder="100000" id="kmh-tutar"/></div><span class="input-suffix">₺</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+              <div class="input-row teal"><div class="input-col"><label>Yıllık Faiz</label><input type="number" inputmode="decimal" placeholder="65" id="kmh-yillik" oninput="kmhSyncYillik()"/></div><span class="input-suffix">%/yıl</span></div>
+              <div class="input-row teal"><div class="input-col"><label>Aylık Faiz</label><input type="number" inputmode="decimal" placeholder="5.42" id="kmh-aylik" oninput="kmhSyncAylik()"/></div><span class="input-suffix">%/ay</span></div>
+            </div>
+            <div class="input-row teal"><span class="input-icon">🗓️</span><div class="input-col"><label>Kullanım Süresi</label><input type="number" inputmode="numeric" placeholder="30" id="kmh-gun"/></div><span class="input-suffix">gün</span></div>
+          </div>
+          <p style="font-size:11px;color:var(--text2);margin-top:10px;line-height:1.5">💡 Günlük faiz: <strong>Aylık faiz ÷ 30</strong> × tutar × gün. KMH'da BSMV <strong>%30</strong> olarak uygulanır.</p>
+        </div>
+
+        <div id="kmh-sonuc" style="display:none">
+          <div class="kmh-result">
+            <div class="kmh-row">
+              <div>
+                <div class="kmh-label">Ödenecek Toplam</div>
+                <div class="kmh-val" id="kmh-toplam-val"></div>
+              </div>
+              <div style="text-align:right">
+                <div class="kmh-label">Faiz Tutarı</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:rgba(255,255,255,.9);margin-top:3px" id="kmh-faiz-val"></div>
+              </div>
+            </div>
+            <div class="kmh-detail">
+              <div class="kmh-det"><div class="kmh-det-label">Günlük Faiz</div><div class="kmh-det-val" id="kmh-gunluk"></div></div>
+              <div class="kmh-det"><div class="kmh-det-label">Günlük Maliyet</div><div class="kmh-det-val" id="kmh-gunluk-tl"></div></div>
+              <div class="kmh-det"><div class="kmh-det-label">BSMV</div><div class="kmh-det-val" id="kmh-bsmv"></div></div>
+              <div class="kmh-det"><div class="kmh-det-label">Efektif Yıllık</div><div class="kmh-det-val" id="kmh-efektif"></div></div>
+            </div>
+          </div>
+
+          <!-- GÜN GÜN TABLO TOGGLE -->
+          <div id="kmh-tablo-wrap">
+            <div class="card" style="padding:0">
+              <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleKmhTable()">
+                <span style="font-size:11px;font-weight:700;color:var(--text2)">GÜN GÜN TABLO</span>
+                <span id="kmh-table-arrow" style="font-size:12px;color:var(--text2)">▼ Göster</span>
+              </div>
+              <div id="kmh-table-inner" style="display:none;border-top:1px solid var(--border)">
+                <div class="kmh-table-wrap">
+                  <table>
+                    <thead><tr><th>Gün</th><th>Bakiye</th><th>Faiz</th><th>BSMV</th><th>Toplam</th></tr></thead>
+                    <tbody id="kmh-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn-sm" style="color:var(--teal);border-color:rgba(8,145,178,.2);background:var(--teal-light)" onclick="saveKmh()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Kaydet
+            </button>
+            <button class="btn-sm b" onclick="shareKmh()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Paylaş
+            </button>
+          </div>
+        </div>
+        <div class="empty" id="kmh-empty">
+          <div class="empty-icon">💳</div>
+          <div class="empty-text">KMH hesaplaması bekleniyor</div>
+          <div class="empty-sub">Tutar, faiz ve gün sayısını girin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: KARŞILAŞTIR ── -->
+    <div class="tab-panel" id="tab-karsi">
+      <div id="karsi-content"></div>
+    </div>
+
+    <!-- ── TAB: GEÇMİŞ ── -->
+    <div class="tab-panel" id="tab-gecmis">
+      <div id="gecmis-content"></div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-hesapla" onclick="switchTab('hesapla','Hesapla')">
+      <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/></svg>
+      <span class="nav-label">Hesapla</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" id="nav-karsi" onclick="switchTab('karsi','Karşılaştır')">
+      <span class="nav-badge" id="badge-karsi"></span>
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="9" height="18" rx="1"/><rect x="13" y="3" width="9" height="18" rx="1"/></svg>
+      <span class="nav-label">Karşılaştır</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" id="nav-gecmis" onclick="switchTab('gecmis','Geçmiş')">
+      <span class="nav-badge" id="badge-gecmis"></span>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="nav-label">Geçmiş</span>
+      <div class="nav-dot"></div>
+    </button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTS ──
+const COLORS=['#1A7A4A','#2563EB','#D97706','#DC2626','#7C3AED','#0891B2'];
+const BSMV_RATE_KREDI = 0.05;  // %5 BSMV (Kredi)
+const BSMV_RATE_KMH   = 0.30;  // %30 BSMV (KMH / Kredili Mevduat)
+
+// ── STATE ──
+let selColor=COLORS[0], curMode='kredi';
+let curKredi=null, curKmh=null;
+let compareList=[], history=loadHist();
+
+// ── FORMAT ──
+const fmt=v=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',maximumFractionDigits:2}).format(v);
+const fmt2=v=>new Intl.NumberFormat('tr-TR',{maximumFractionDigits:2}).format(v);
+const fmtPct=(v,d=4)=>'%'+v.toFixed(d).replace('.',',');
+const fmtDate=ts=>new Date(ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
+
+// ── COLOR DOTS ──
+const dotsEl=document.getElementById('color-dots');
+COLORS.forEach((c,i)=>{
+  const d=document.createElement('div');
+  d.className='color-dot'+(i===0?' selected':'');
+  d.style.background=c;
+  d.onclick=()=>{selColor=c;document.querySelectorAll('.color-dot').forEach((x,j)=>x.classList.toggle('selected',j===i));};
+  dotsEl.appendChild(d);
+});
+
+// ── MODE SWITCH ──
+function setMode(m){
+  curMode=m;
+  document.getElementById('seg-kredi').classList.toggle('active',m==='kredi');
+  document.getElementById('seg-kmh').classList.toggle('active',m==='kmh');
+  document.getElementById('section-kredi').style.display=m==='kredi'?'block':'none';
+  document.getElementById('section-kmh').style.display=m==='kmh'?'block':'none';
+}
+
+// ── KREDI CALC ──
+function hesapla(){
+  const P=parseFloat(document.getElementById('inp-anapara').value);
+  const r_raw=parseFloat(document.getElementById('inp-faiz').value);
+  const n=parseInt(document.getElementById('inp-sure').value);
+  if(!P||!r_raw||!n||P<=0||r_raw<=0||n<=0){curKredi=null;renderKredi();return;}
+  const bsmvAcik=document.getElementById('bsmv-toggle').checked;
+  const rv=bsmvAcik ? r_raw*1.3 : r_raw;  // Kredi BSMV: ×1.3 = %5 üzerinden
+  const r=rv/100;
+  const yyo=rv*12, ef=(Math.pow(1+r,12)-1)*100;
+  const mo=(P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  const tot=mo*n, tf=tot-P, mf=P*r;
+  const sch=[];let kalan=P;
+  for(let i=1;i<=n;i++){const f=kalan*r,a=mo-f;kalan-=a;sch.push({ay:i,mo,a,f,kalan:Math.max(0,kalan)});}
+  curKredi={P,n,r_raw,rv,yyo,ef,mo,tf,tot,mf,sch,bsmvAcik};
+  renderKredi();
+  renderEnflasyon();
+}
+
+function renderKredi(){
+  const empty=document.getElementById('kredi-empty');
+  const res=document.getElementById('kredi-sonuc');
+  if(!curKredi){empty.style.display='flex';res.style.display='none';return;}
+  empty.style.display='none';res.style.display='block';
+  const s=curKredi;
+  if(s.bsmvAcik){
+    document.getElementById('v-formula').textContent=s.r_raw.toFixed(4).replace('.',',')+' % × 1,3 (BSMV dahil)';
+  } else {
+    document.getElementById('v-formula').textContent='BSMV uygulanmıyor';
+  }
+  document.getElementById('v-val').textContent=fmtPct(s.rv,4);
+  document.getElementById('qs-aylik').textContent=fmt(s.mo);
+  document.getElementById('qs-yyo').textContent=fmtPct(s.yyo,2)+' / '+fmtPct(s.ef,2);
+  document.getElementById('qs-toplam').textContent=fmt(s.tot);
+  document.getElementById('qs-faiz').textContent=fmt(s.tf);
+}
+
+['inp-anapara','inp-faiz','inp-sure'].forEach(id=>document.getElementById(id).addEventListener('input',hesapla));
+
+// ── ENFLASYON ──
+function renderEnflasyon(){
+  const enf=parseFloat(document.getElementById('inp-enflasyon').value);
+  const el=document.getElementById('enflasyon-sonuc');
+  if(!curKredi||!enf||enf<=0){el.style.display='none';return;}
+  el.style.display='block';
+  const s=curKredi;
+  const nominalFaizPct=(s.tf/s.P)*100;
+  const yillikNominal=s.yyo;
+  // Fisher equation: reel faiz = ((1+nominal)/(1+enflasyon)) - 1
+  const reelYillik=((1+yillikNominal/100)/(1+enf/100)-1)*100;
+  const reelAylik=reelYillik/12;
+  const reelFaizYuku=reelAylik>0?(reelAylik/12*s.n*s.P/100):0;
+  const eriyecek=s.P*(Math.pow(1+enf/100,s.n/12)-1);
+  const gercekMaliyet=Math.max(0,s.tf-eriyecek);
+  const maxPct=Math.max(nominalFaizPct,Math.abs(reelYillik)*s.n/12);
+
+  document.getElementById('inf-nominal-pct').textContent=fmtPct(nominalFaizPct,1)+' toplam';
+  document.getElementById('inf-nominal-bar').style.width=Math.min(100,nominalFaizPct/2)+'%';
+  const reelPct=Math.max(0,(reelYillik*s.n/12));
+  document.getElementById('inf-reel-pct').textContent=reelYillik>0?fmtPct(reelPct,1)+' toplam':'Negatif (enflasyon > faiz)';
+  document.getElementById('inf-reel-bar').style.width=Math.min(100,Math.max(0,reelPct/2))+'%';
+  document.getElementById('inf-reel-oran').textContent=fmtPct(reelYillik,2)+' yıllık';
+  document.getElementById('inf-eriyecek').textContent=fmt(eriyecek);
+  document.getElementById('inf-gercek').textContent=fmt(gercekMaliyet);
+}
+
+// ── KMH SYNC ──
+let kmhSyncing=false;
+function kmhSyncYillik(){
+  if(kmhSyncing)return;
+  kmhSyncing=true;
+  const y=parseFloat(document.getElementById('kmh-yillik').value);
+  if(y>0){
+    // Yıllık → Aylık: (1 + y/100)^(1/12) - 1
+    const aylik=((Math.pow(1+y/100,1/12)-1)*100);
+    document.getElementById('kmh-aylik').value=aylik.toFixed(4);
+  } else {
+    document.getElementById('kmh-aylik').value='';
+  }
+  kmhSyncing=false;
+  hesaplaKmh();
+}
+function kmhSyncAylik(){
+  if(kmhSyncing)return;
+  kmhSyncing=true;
+  const a=parseFloat(document.getElementById('kmh-aylik').value);
+  if(a>0){
+    // Aylık → Yıllık: (1 + a/100)^12 - 1
+    const yillik=((Math.pow(1+a/100,12)-1)*100);
+    document.getElementById('kmh-yillik').value=yillik.toFixed(4);
+  } else {
+    document.getElementById('kmh-yillik').value='';
+  }
+  kmhSyncing=false;
+  hesaplaKmh();
+}
+
+// ── KMH CALC ──
+function hesaplaKmh(){
+  const tutar=parseFloat(document.getElementById('kmh-tutar').value);
+  const yillik=parseFloat(document.getElementById('kmh-yillik').value);
+  const aylik=parseFloat(document.getElementById('kmh-aylik').value);
+  const gun=parseInt(document.getElementById('kmh-gun').value);
+  if(!tutar||!yillik||!gun||tutar<=0||yillik<=0||gun<=0){curKmh=null;renderKmh();return;}
+
+  // Günlük oran: aylık faiz ÷ 30 (hesapkurdu formülü)
+  const aylikOran=(aylik>0?aylik:yillik/12)/100;
+  const gunlukOran=aylikOran/30;
+  // BSMV %30 dahil günlük oran
+  const gunlukOranBsmv=gunlukOran*(1+BSMV_RATE_KMH);
+  const toplamFaiz=tutar*gunlukOran*gun;
+  const toplamBsmv=toplamFaiz*BSMV_RATE_KMH;
+  const toplamFaizBsmv=toplamFaiz+toplamBsmv;
+  const toplamOdeme=tutar+toplamFaizBsmv;
+  const gunlukTl=tutar*gunlukOranBsmv;
+  const efektif=(Math.pow(1+gunlukOranBsmv,365)-1)*100;
+
+  // Günlük tablo
+  const tablo=[];
+  let bakiye=tutar;
+  for(let i=1;i<=gun;i++){
+    const gFaiz=bakiye*gunlukOran;
+    const gBsmv=gFaiz*BSMV_RATE_KMH;
+    const gToplam=gFaiz+gBsmv;
+    bakiye+=gToplam;
+    tablo.push({gun:i,bakiye,gFaiz,gBsmv,gToplam});
+  }
+
+  curKmh={tutar,yillik,aylik:aylikOran*100,gun,gunlukOran,gunlukOranBsmv,toplamFaiz,toplamBsmv,toplamFaizBsmv,toplamOdeme,gunlukTl,efektif,tablo};
+  renderKmh();
+}
+
+function renderKmh(){
+  const empty=document.getElementById('kmh-empty');
+  const res=document.getElementById('kmh-sonuc');
+  if(!curKmh){empty.style.display='flex';res.style.display='none';return;}
+  empty.style.display='none';res.style.display='block';
+  const k=curKmh;
+  document.getElementById('kmh-toplam-val').textContent=fmt(k.toplamOdeme);
+  document.getElementById('kmh-faiz-val').textContent=fmt(k.toplamFaizBsmv);
+  document.getElementById('kmh-gunluk').textContent=fmtPct(k.gunlukOranBsmv*100,6);
+  document.getElementById('kmh-gunluk-tl').textContent=fmt(k.gunlukTl)+'/gün';
+  document.getElementById('kmh-bsmv').textContent=fmt(k.toplamBsmv);
+  document.getElementById('kmh-efektif').textContent=fmtPct(k.efektif,2);
+
+  // Tablo
+  const tbody=document.getElementById('kmh-tbody');
+  tbody.innerHTML=k.tablo.map(r=>`<tr>
+    <td>${r.gun}</td>
+    <td>${fmt(r.bakiye)}</td>
+    <td class="td-amber">${fmt(r.gFaiz)}</td>
+    <td>${fmt(r.gBsmv)}</td>
+    <td class="td-red">${fmt(r.gToplam)}</td>
+  </tr>`).join('');
+}
+
+['kmh-tutar','kmh-gun'].forEach(id=>document.getElementById(id).addEventListener('input',hesaplaKmh));
+
+let kmhTableOpen=false;
+function toggleKmhTable(){
+  kmhTableOpen=!kmhTableOpen;
+  document.getElementById('kmh-table-inner').style.display=kmhTableOpen?'block':'none';
+  document.getElementById('kmh-table-arrow').textContent=kmhTableOpen?'▲ Gizle':'▼ Göster';
+}
+
+// ── SHARE ──
+function shareKredi(){
+  if(!curKredi)return;
+  const name=document.getElementById('inp-name').value.trim()||'Kredi';
+  const s=curKredi;
+  const text=`📊 ${name} — KrediHesap
+━━━━━━━━━━━━━━━
+💰 Ana Para: ${fmt(s.P)}
+📈 Aylık Faiz: ${fmtPct(s.r_raw,2)} → Vergili: ${fmtPct(s.rv,4)}
+🗓️ Vade: ${s.n} ay
+━━━━━━━━━━━━━━━
+📆 Aylık Ödeme: ${fmt(s.mo)}
+📊 YYO: ${fmtPct(s.yyo,2)} | Efektif: ${fmtPct(s.ef,2)}
+💸 Toplam Faiz: ${fmt(s.tf)}
+✅ Toplam Ödenen: ${fmt(s.tot)}`;
+  copyText(text,'Kredi sonuçları kopyalandı');
+}
+
+function shareKmh(){
+  if(!curKmh)return;
+  const k=curKmh;
+  const text=`💳 Kredili Mevduat Hesabı — KrediHesap
+━━━━━━━━━━━━━━━
+💰 Çekilen: ${fmt(k.tutar)}
+📈 Yıllık Faiz: ${fmtPct(k.yillik,2)}
+🗓️ Kullanım: ${k.gun} gün
+━━━━━━━━━━━━━━━
+📆 Günlük Maliyet: ${fmt(k.gunlukTl)}
+💸 Toplam Faiz+BSMV: ${fmt(k.toplamFaizBsmv)}
+✅ Ödenecek: ${fmt(k.toplamOdeme)}
+📊 Efektif Yıllık: ${fmtPct(k.efektif,2)}`;
+  copyText(text,'KMH sonuçları kopyalandı');
+}
+
+function copyText(text,msg){
+  if(navigator.share){navigator.share({text}).catch(()=>{});}
+  else{
+    navigator.clipboard.writeText(text).then(()=>showToast('📋 '+msg)).catch(()=>{
+      const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('📋 '+msg);
+    });
+  }
+}
+
+// ── SAVE ──
+function saveKredi(){
+  if(!curKredi)return;
+  const name=document.getElementById('inp-name').value.trim()||('Kredi '+(history.length+1));
+  const entry={id:Date.now(),type:'kredi',name,color:selColor,date:Date.now(),...curKredi};
+  if(compareList.length<4)compareList.push(entry);
+  else showToast('⚠️ Karşılaştırmada max 4 kredi');
+  history.unshift(entry);if(history.length>30)history=history.slice(0,30);
+  saveHistFn();setBadge('badge-karsi',compareList.length);setBadge('badge-gecmis',history.length);
+  showToast('✓ '+name+' kaydedildi');
+}
+
+function saveKmh(){
+  if(!curKmh)return;
+  const name='KMH '+fmt2(curKmh.tutar)+' / '+curKmh.gun+'g';
+  const entry={id:Date.now(),type:'kmh',name,color:COLORS[5],date:Date.now(),...curKmh};
+  history.unshift(entry);if(history.length>30)history=history.slice(0,30);
+  saveHistFn();setBadge('badge-gecmis',history.length);
+  showToast('✓ KMH kaydedildi');
+}
+
+// ── COMPARE ──
+function renderKarsi(){
+  const el=document.getElementById('karsi-content');
+  const krediler=compareList.filter(c=>c.type==='kredi');
+  if(!krediler.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">⚖️</div><div class="empty-text">Kredi eklenmedi</div><div class="empty-sub">Hesapla → Kaydet &amp; Karşılaştır</div></div>`;
+    return;
+  }
+  const minMo=Math.min(...krediler.map(c=>c.mo));
+  const minTf=Math.min(...krediler.map(c=>c.tf));
+  const maxMo=Math.max(...krediler.map(c=>c.mo));
+  const winner=krediler.find(c=>c.mo===minMo);
+  let html=`<div class="winner-banner"><div class="winner-icon">🏆</div><div><div class="wt1">En Uygun Taksit</div><div class="wt2">${winner.name}</div></div></div><div class="compare-list">`;
+  krediler.forEach(c=>{
+    const best=c.mo===minMo, bestFaiz=c.tf===minTf;
+    const bp=(c.mo/maxMo*100);
+    html+=`<div class="compare-card ${best?'best':''}">
+      <button class="cc-del" onclick="removeCompare(${c.id})">✕</button>
+      <div class="cc-header">
+        <div class="cc-name-row"><div class="cc-dot" style="background:${c.color}"></div><span class="cc-name">${c.name}</span></div>
+        <div class="cc-badges">${best?'<span class="badge badge-green">En Düşük</span>':''}${bestFaiz&&!best?'<span class="badge badge-amber">Az Faiz</span>':''}</div>
+      </div>
+      <div class="cc-grid">
+        <div class="cc-stat ${best?'hl-g':''}"><div class="cc-stat-label">Aylık Ödeme</div><div class="cc-stat-val">${fmt(c.mo)}</div></div>
+        <div class="cc-stat"><div class="cc-stat-label">Vade</div><div class="cc-stat-val">${c.n} ay</div></div>
+        <div class="cc-stat ${bestFaiz?'hl-a':''}"><div class="cc-stat-label">Toplam Faiz</div><div class="cc-stat-val">${fmt(c.tf)}</div></div>
+        <div class="cc-stat"><div class="cc-stat-label">Toplam Ödenen</div><div class="cc-stat-val">${fmt(c.tot)}</div></div>
+        <div class="cc-stat"><div class="cc-stat-label">YYO</div><div class="cc-stat-val">${fmtPct(c.yyo,2)}</div></div>
+        <div class="cc-stat"><div class="cc-stat-label">Efektif</div><div class="cc-stat-val">${fmtPct(c.ef,2)}</div></div>
+      </div>
+      <div><div class="cc-bar-label"><span>Taksit ağırlığı</span><span>${bp.toFixed(0)}%</span></div>
+      <div class="cc-bar"><div class="cc-bar-fill" style="width:${bp}%;background:${c.color}"></div></div></div>
+    </div>`;
+  });
+  html+=`</div><button class="btn-sm r" style="width:100%" onclick="clearCompare()">Karşılaştırmayı Temizle</button>`;
+  el.innerHTML=html;
+}
+
+function removeCompare(id){compareList=compareList.filter(c=>c.id!==id);setBadge('badge-karsi',compareList.length);renderKarsi();}
+function clearCompare(){compareList=[];setBadge('badge-karsi',0);renderKarsi();}
+
+// ── HISTORY ──
+function renderGecmis(){
+  const el=document.getElementById('gecmis-content');
+  if(!history.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🕐</div><div class="empty-text">Geçmiş yok</div><div class="empty-sub">Kaydettiğiniz hesaplamalar burada görünür</div></div>`;return;}
+  let html=`<div class="btn-row"><button class="btn-sm g" onclick="loadAllCompare()">Tümünü Karşılaştır</button><button class="btn-sm r" onclick="clearHistAll()">Geçmişi Sil</button></div><div class="history-list">`;
+  history.forEach(h=>{
+    const isKmh=h.type==='kmh';
+    const meta=isKmh?`${fmt(h.tutar)} · ${h.yillik}% · ${h.gun}gün`:`${fmt(h.P)} · ${h.r_raw.toFixed(2).replace('.',',')}% · ${h.n}ay`;
+    const valStr=isKmh?fmt(h.toplamOdeme):fmt(h.mo);
+    const badge=isKmh?'<span class="hist-type ht-kmh">KMH</span>':'<span class="hist-type ht-kredi">Kredi</span>';
+    html+=`<div class="hist-card" onclick="loadHistItem(${h.id})">
+      <div class="hist-color" style="background:${h.color}"></div>
+      <div class="hist-body">${badge}<div class="hist-name">${h.name}</div><div class="hist-meta">${meta}</div></div>
+      <div class="hist-right"><div class="hist-aylik">${valStr}</div><div class="hist-date">${fmtDate(h.date)}</div></div>
+      <button class="hist-del" onclick="event.stopPropagation();delHist(${h.id})">✕</button>
+    </div>`;
+  });
+  el.innerHTML=html+'</div>';
+}
+
+function loadHistItem(id){
+  const h=history.find(x=>x.id===id);if(!h)return;
+  if(h.type==='kredi'){
+    setMode('kredi');
+    document.getElementById('inp-name').value=h.name;
+    document.getElementById('inp-anapara').value=h.P;
+    document.getElementById('inp-faiz').value=h.r_raw;
+    document.getElementById('inp-sure').value=h.n;
+    selColor=h.color;document.querySelectorAll('.color-dot').forEach((d,i)=>d.classList.toggle('selected',COLORS[i]===h.color));
+    hesapla();
+  } else {
+    setMode('kmh');
+    document.getElementById('kmh-tutar').value=h.tutar;
+    document.getElementById('kmh-yillik').value=h.yillik;
+    const aylik=((Math.pow(1+h.yillik/100,1/12)-1)*100);
+    document.getElementById('kmh-aylik').value=aylik.toFixed(4);
+    document.getElementById('kmh-gun').value=h.gun;
+    hesaplaKmh();
+  }
+  switchTab('hesapla','Hesapla');
+  showToast('📂 '+h.name+' yüklendi');
+}
+
+function loadAllCompare(){
+  const krediler=history.filter(h=>h.type==='kredi').slice(0,4);
+  compareList=krediler.map(h=>({...h}));
+  setBadge('badge-karsi',compareList.length);
+  renderKarsi();switchTab('karsi','Karşılaştır');
+  showToast('✓ '+compareList.length+' kredi eklendi');
+}
+
+function delHist(id){history=history.filter(h=>h.id!==id);saveHistFn();setBadge('badge-gecmis',history.length);renderGecmis();}
+function clearHistAll(){if(!confirm('Tüm geçmiş silinsin mi?'))return;history=[];saveHistFn();setBadge('badge-gecmis',0);renderGecmis();}
+
+// ── STORAGE ──
+function loadHist(){try{const d=localStorage.getItem('kh3');return d?JSON.parse(d):[];}catch(e){return[];}}
+function saveHistFn(){try{localStorage.setItem('kh3',JSON.stringify(history));}catch(e){}}
+
+// ── UTILS ──
+function setBadge(id,n){const el=document.getElementById(id);if(n>0){el.style.display='flex';el.textContent=n;}else{el.style.display='none';}}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+function switchTab(id,title){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  document.getElementById('pageTitle').textContent=title;
+  document.querySelector('.scroll-area').scrollTop=0;
+  if(id==='gecmis')renderGecmis();
+  if(id==='karsi')renderKarsi();
+}
+
+// ── INIT ──
+setBadge('badge-gecmis',history.length);
+setBadge('badge-karsi',compareList.length);
+renderGecmis();renderKarsi();renderKmh();renderKredi();
+</script>
+</body>
+</html>
