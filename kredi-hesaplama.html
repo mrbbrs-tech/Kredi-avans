@@ -227,10 +227,11 @@ tbody tr:nth-child(even){background:rgba(0,0,0,.012)}
 
     <!-- ── TAB: HESAPLA ── -->
     <div class="tab-panel active" id="tab-hesapla">
-      <!-- SEGMENT: Kredi / KMH -->
+      <!-- SEGMENT: Kredi / KMH / Mevduat -->
       <div class="segment">
         <button class="seg-btn active" id="seg-kredi" onclick="setMode('kredi')">🏦 Kredi</button>
-        <button class="seg-btn" id="seg-kmh" onclick="setMode('kmh')">💳 KMH / Kredili Mevduat</button>
+        <button class="seg-btn" id="seg-kmh" onclick="setMode('kmh')">💳 KMH</button>
+        <button class="seg-btn" id="seg-mevduat" onclick="setMode('mevduat')">🏛️ Mevduat</button>
       </div>
 
       <!-- KREDI SECTION -->
@@ -380,6 +381,121 @@ tbody tr:nth-child(even){background:rgba(0,0,0,.012)}
           <div class="empty-sub">Tutar, faiz ve gün sayısını girin</div>
         </div>
       </div>
+
+      <!-- MEVDUAT SECTION -->
+      <div id="section-mevduat" style="display:none">
+
+        <div class="segment" style="margin-bottom:10px">
+          <button class="seg-btn active" id="seg-mev-duz" onclick="setMevMode('duz')">📈 Faiz → Getiri</button>
+          <button class="seg-btn" id="seg-mev-ters" onclick="setMevMode('ters')">🔍 Getiri → Faiz</button>
+        </div>
+
+        <!-- DÜZ -->
+        <div id="section-mev-duz">
+          <div class="card">
+            <div class="card-title">Mevduat Bilgileri</div>
+            <div class="input-group">
+              <div class="input-row"><span class="input-icon">💰</span><div class="input-col"><label>Anapara</label><input type="number" inputmode="decimal" placeholder="100000" id="mev-anapara"/></div><span class="input-suffix">₺</span></div>
+              <div class="input-row"><span class="input-icon">📈</span><div class="input-col"><label>Yıllık Faiz Oranı (Brüt)</label><input type="number" inputmode="decimal" placeholder="55" id="mev-faiz"/></div><span class="input-suffix">%</span></div>
+              <div class="input-row"><span class="input-icon">🗓️</span><div class="input-col"><label>Vade</label><input type="number" inputmode="numeric" placeholder="32" id="mev-gun"/></div><span class="input-suffix">gün</span></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:11px 14px;background:var(--surface2);border-radius:11px;">
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text)">Stopaj Vergisi</div>
+                <div style="font-size:10px;color:var(--text2);margin-top:1px">Getiriden %15 stopaj düşülsün</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="mev-stopaj" checked onchange="hesaplaMev()"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div id="mev-duz-sonuc" style="display:none">
+            <div style="background:#7C3AED;border-radius:18px;padding:20px 18px;margin-bottom:10px;position:relative;overflow:hidden">
+              <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.07);border-radius:50%"></div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">Net Getiri</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:600;color:#fff;margin:4px 0 0" id="mev-net-getiri"></div>
+              <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px" id="mev-net-toplam-sub"></div>
+            </div>
+            <div class="mini-grid">
+              <div class="mini-card"><div class="mini-label">Brüt Getiri</div><div class="mini-val" id="mev-brut"></div></div>
+              <div class="mini-card red"><div class="mini-label">Stopaj (%15)</div><div class="mini-val" id="mev-stopaj-tutar"></div></div>
+              <div class="mini-card"><div class="mini-label">Net Toplam</div><div class="mini-val" id="mev-net-toplam"></div></div>
+              <div class="mini-card teal"><div class="mini-label">Günlük Net</div><div class="mini-val" id="mev-gunluk-net"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Faiz Oranları</div>
+              <div class="stat-row"><span class="s-label">Brüt yıllık</span><span class="s-val" id="mev-brut-yillik"></span></div>
+              <div class="stat-row"><span class="s-label">Net yıllık</span><span class="s-val green" id="mev-net-yillik"></span></div>
+              <div class="stat-row"><span class="s-label">Aylık net</span><span class="s-val" id="mev-aylik-net"></span></div>
+              <div class="stat-row"><span class="s-label">Günlük net</span><span class="s-val" id="mev-gunluk-oran"></span></div>
+              <div class="stat-row"><span class="s-label">Efektif yıllık (bileşik)</span><span class="s-val blue" id="mev-efektif"></span></div>
+            </div>
+            <button class="btn-sm b" style="width:100%;justify-content:center;margin-bottom:10px" onclick="shareMev()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Paylaş
+            </button>
+          </div>
+          <div class="empty" id="mev-duz-empty">
+            <div class="empty-icon">🏦</div>
+            <div class="empty-text">Mevduat hesaplaması bekleniyor</div>
+            <div class="empty-sub">Anapara, faiz ve vadeyi girin</div>
+          </div>
+        </div>
+
+        <!-- TERS -->
+        <div id="section-mev-ters" style="display:none">
+          <div class="card">
+            <div class="card-title">Ters Hesaplama</div>
+            <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Vadede elinize geçen tutarı girin — hangi faize denk geldiğini bulalım.</p>
+            <div class="input-group">
+              <div class="input-row"><span class="input-icon">💰</span><div class="input-col"><label>Yatırılan Anapara</label><input type="number" inputmode="decimal" placeholder="100000" id="mev-t-anapara"/></div><span class="input-suffix">₺</span></div>
+              <div class="input-row"><span class="input-icon">✅</span><div class="input-col"><label>Vadede Gelen Toplam</label><input type="number" inputmode="decimal" placeholder="102000" id="mev-t-toplam"/></div><span class="input-suffix">₺</span></div>
+              <div class="input-row"><span class="input-icon">🗓️</span><div class="input-col"><label>Vade</label><input type="number" inputmode="numeric" placeholder="32" id="mev-t-gun"/></div><span class="input-suffix">gün</span></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:11px 14px;background:var(--surface2);border-radius:11px;">
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text)">Gelen tutar net mi?</div>
+                <div style="font-size:10px;color:var(--text2);margin-top:1px">Açıksa stopaj zaten düşülmüş demektir</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="mev-t-net" checked onchange="hesaplaMevTers()"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div id="mev-ters-sonuc" style="display:none">
+            <div style="background:#7C3AED;border-radius:18px;padding:20px 18px;margin-bottom:10px;position:relative;overflow:hidden">
+              <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.07);border-radius:50%"></div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)" id="mev-t-hero-label">Brüt Yıllık Faiz</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:600;color:#fff;margin:4px 0 0" id="mev-t-brut-yillik"></div>
+              <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px" id="mev-t-sub"></div>
+            </div>
+            <div class="mini-grid">
+              <div class="mini-card"><div class="mini-label">Net Getiri</div><div class="mini-val" id="mev-t-net-getiri"></div></div>
+              <div class="mini-card teal"><div class="mini-label">Günlük Net</div><div class="mini-val" id="mev-t-gunluk"></div></div>
+              <div class="mini-card"><div class="mini-label">Aylık Net Oran</div><div class="mini-val" id="mev-t-aylik"></div></div>
+              <div class="mini-card blue"><div class="mini-label">Efektif Yıllık</div><div class="mini-val" id="mev-t-efektif"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Detay</div>
+              <div class="stat-row"><span class="s-label">Net yıllık oran</span><span class="s-val green" id="mev-t-net-yillik"></span></div>
+              <div class="stat-row"><span class="s-label">Brüt yıllık oran</span><span class="s-val" id="mev-t-brut-yillik2"></span></div>
+              <div class="stat-row"><span class="s-label">Stopaj tutarı</span><span class="s-val red" id="mev-t-stopaj"></span></div>
+            </div>
+            <button class="btn-sm b" style="width:100%;justify-content:center;margin-bottom:10px" onclick="shareMevTers()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Paylaş
+            </button>
+          </div>
+          <div class="empty" id="mev-ters-empty">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-text">Ters hesaplama bekleniyor</div>
+            <div class="empty-sub">Anapara, gelen tutar ve vadeyi girin</div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <!-- ── TAB: KARŞILAŞTIR ── -->
@@ -449,8 +565,10 @@ function setMode(m){
   curMode=m;
   document.getElementById('seg-kredi').classList.toggle('active',m==='kredi');
   document.getElementById('seg-kmh').classList.toggle('active',m==='kmh');
+  document.getElementById('seg-mevduat').classList.toggle('active',m==='mevduat');
   document.getElementById('section-kredi').style.display=m==='kredi'?'block':'none';
   document.getElementById('section-kmh').style.display=m==='kmh'?'block':'none';
+  document.getElementById('section-mevduat').style.display=m==='mevduat'?'block':'none';
 }
 
 // ── KREDI CALC ──
@@ -794,6 +912,127 @@ function switchTab(id,title){
   if(id==='gecmis')renderGecmis();
   if(id==='karsi')renderKarsi();
 }
+
+// ── MEVDUAT ──
+let curMevMode='duz';
+
+function setMevMode(m){
+  curMevMode=m;
+  document.getElementById('seg-mev-duz').classList.toggle('active',m==='duz');
+  document.getElementById('seg-mev-ters').classList.toggle('active',m==='ters');
+  document.getElementById('section-mev-duz').style.display=m==='duz'?'block':'none';
+  document.getElementById('section-mev-ters').style.display=m==='ters'?'block':'none';
+}
+
+function hesaplaMev(){
+  const P=parseFloat(document.getElementById('mev-anapara').value);
+  const yillik=parseFloat(document.getElementById('mev-faiz').value);
+  const gun=parseInt(document.getElementById('mev-gun').value);
+  const stopaj=document.getElementById('mev-stopaj').checked;
+  const empty=document.getElementById('mev-duz-empty');
+  const res=document.getElementById('mev-duz-sonuc');
+  if(!P||!yillik||!gun||P<=0||yillik<=0||gun<=0){empty.style.display='flex';res.style.display='none';return;}
+
+  const gunlukOran=yillik/100/365;
+  const brutGetiri=P*gunlukOran*gun;
+  const stopajTutar=stopaj?brutGetiri*0.15:0;
+  const netGetiri=brutGetiri-stopajTutar;
+  const netToplam=P+netGetiri;
+  const netYillik=(netGetiri/P)*(365/gun)*100;
+  const brutYillik=yillik;
+  const efektif=(Math.pow(1+gunlukOran,365)-1)*100;
+  const netEfektif=stopaj?efektif*0.85:efektif;
+
+  empty.style.display='none';res.style.display='block';
+  document.getElementById('mev-net-getiri').textContent=fmt(netGetiri);
+  document.getElementById('mev-net-toplam-sub').textContent=gun+' gün sonra toplam: '+fmt(netToplam);
+  document.getElementById('mev-brut').textContent=fmt(brutGetiri);
+  document.getElementById('mev-stopaj-tutar').textContent=stopaj?fmt(stopajTutar):'—';
+  document.getElementById('mev-net-toplam').textContent=fmt(netToplam);
+  document.getElementById('mev-gunluk-net').textContent=fmt(netGetiri/gun)+'/gün';
+  document.getElementById('mev-brut-yillik').textContent=fmtPct(brutYillik,2);
+  document.getElementById('mev-net-yillik').textContent=fmtPct(netYillik,2);
+  document.getElementById('mev-aylik-net').textContent=fmtPct(netYillik/12,4);
+  document.getElementById('mev-gunluk-oran').textContent=fmtPct(netYillik/365,6);
+  document.getElementById('mev-efektif').textContent=fmtPct(netEfektif,2);
+}
+
+function hesaplaMevTers(){
+  const P=parseFloat(document.getElementById('mev-t-anapara').value);
+  const toplam=parseFloat(document.getElementById('mev-t-toplam').value);
+  const gun=parseInt(document.getElementById('mev-t-gun').value);
+  const isNet=document.getElementById('mev-t-net').checked;
+  const empty=document.getElementById('mev-ters-empty');
+  const res=document.getElementById('mev-ters-sonuc');
+  if(!P||!toplam||!gun||P<=0||toplam<=P||gun<=0){empty.style.display='flex';res.style.display='none';return;}
+
+  const netGetiri=toplam-P;
+  // Eğer net ise brüt getiriyi geri hesapla: brüt = net / 0.85
+  const brutGetiri=isNet?netGetiri/0.85:netGetiri;
+  const stopajTutar=isNet?netGetiri/0.85*0.15:0;
+  const gercekNetGetiri=isNet?netGetiri:netGetiri*0.85;
+
+  const netGunlukOran=gercekNetGetiri/P/gun;
+  const brutGunlukOran=brutGetiri/P/gun;
+  const netYillik=netGunlukOran*365*100;
+  const brutYillik=brutGunlukOran*365*100;
+  const efektif=(Math.pow(1+netGunlukOran,365)-1)*100;
+
+  empty.style.display='none';res.style.display='block';
+  document.getElementById('mev-t-hero-label').textContent=isNet?'Brüt Yıllık Faiz':'Net Yıllık Faiz';
+  document.getElementById('mev-t-brut-yillik').textContent=fmtPct(brutYillik,2);
+  document.getElementById('mev-t-sub').textContent=gun+' günlük vade · '+fmt(P)+' anapara';
+  document.getElementById('mev-t-net-getiri').textContent=fmt(gercekNetGetiri);
+  document.getElementById('mev-t-gunluk').textContent=fmt(gercekNetGetiri/gun)+'/gün';
+  document.getElementById('mev-t-aylik').textContent=fmtPct(netYillik/12,4);
+  document.getElementById('mev-t-efektif').textContent=fmtPct(efektif,2);
+  document.getElementById('mev-t-net-yillik').textContent=fmtPct(netYillik,2);
+  document.getElementById('mev-t-brut-yillik2').textContent=fmtPct(brutYillik,2);
+  document.getElementById('mev-t-stopaj').textContent=isNet?fmt(stopajTutar):'Hesaplanmadı (brüt girildi)';
+}
+
+function shareMev(){
+  const P=parseFloat(document.getElementById('mev-anapara').value);
+  const yillik=parseFloat(document.getElementById('mev-faiz').value);
+  const gun=parseInt(document.getElementById('mev-gun').value);
+  if(!P||!yillik||!gun)return;
+  const brutGetiri=P*(yillik/100/365)*gun;
+  const netGetiri=brutGetiri*0.85;
+  const text=`🏦 Mevduat Hesabı — KrediHesap
+━━━━━━━━━━━━━━━
+💰 Anapara: ${fmt(P)}
+📈 Brüt Yıllık: ${fmtPct(yillik,2)}
+🗓️ Vade: ${gun} gün
+━━━━━━━━━━━━━━━
+💸 Brüt Getiri: ${fmt(brutGetiri)}
+🧾 Stopaj (%15): ${fmt(brutGetiri*0.15)}
+✅ Net Getiri: ${fmt(netGetiri)}
+🏦 Net Toplam: ${fmt(P+netGetiri)}`;
+  copyText(text,'Mevduat sonuçları kopyalandı');
+}
+
+function shareMevTers(){
+  const P=parseFloat(document.getElementById('mev-t-anapara').value);
+  const toplam=parseFloat(document.getElementById('mev-t-toplam').value);
+  const gun=parseInt(document.getElementById('mev-t-gun').value);
+  if(!P||!toplam||!gun)return;
+  const netGetiri=toplam-P;
+  const brutYillik=(netGetiri/0.85)/P/gun*365*100;
+  const netYillik=netGetiri/P/gun*365*100;
+  const text=`🔍 Ters Mevduat Hesabı — KrediHesap
+━━━━━━━━━━━━━━━
+💰 Anapara: ${fmt(P)}
+✅ Gelen Toplam: ${fmt(toplam)}
+🗓️ Vade: ${gun} gün
+━━━━━━━━━━━━━━━
+📈 Net Yıllık Faiz: ${fmtPct(netYillik,2)}
+📊 Brüt Yıllık Faiz: ${fmtPct(brutYillik,2)}
+💵 Net Getiri: ${fmt(netGetiri)}`;
+  copyText(text,'Ters mevduat sonuçları kopyalandı');
+}
+
+['mev-anapara','mev-faiz','mev-gun'].forEach(id=>document.getElementById(id).addEventListener('input',hesaplaMev));
+['mev-t-anapara','mev-t-toplam','mev-t-gun'].forEach(id=>document.getElementById(id).addEventListener('input',hesaplaMevTers));
 
 // ── INIT ──
 setBadge('badge-gecmis',history.length);
